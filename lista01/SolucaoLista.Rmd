@@ -1,0 +1,75 @@
+---
+title: "Solução Lista 01"
+author: |
+        | Nome: Luiz Lima Cezario
+        | E-mail: luiz.cezario@aluno.ufabc.edu.br
+        | Nome: Fulano de Tal
+        | E-mail: fdt@aluno.ufabc.edu.br
+        | (Não é preciso informar os RAs)
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = T,
+                      fig.align='center',
+                      cache=TRUE,
+                      out.width = "60%",
+                      out.heigth = "60%",
+                      warning=FALSE,
+                      message=FALSE)
+options(width =70)
+```
+
+## Exercício 01
+
+* Problema de classificacao
+um exemplo de classificador e quando se usa de um paciente para classificar como doente ou não-doente.
+
+
+* Problema de regressao
+um exemplo e um modelo que utilize a idade e os anos de escolaridade de um indivíduo não-observado anteriormente para tentar prever seu salário. Utiliza-se como base desse modelo: idades, anos de escolaridades e salários de diversos indivíduos já observados anteriormente.
+
+* problema de agrupamento
+um exemplo e agrupar fotos de animais similares em clusters, sem ter o conhecimento prévio de qual animal está sendo apresentado.
+
+## Exercício 02
+
+A maldiçao da dimensionalidade e um problema que diz que apesar de quanto mais caracterista tiver para se analisar e classificar melhoraria a porcentagem de acerto porem ai quanto mais dados tivesse seria mais demorado para se classificar assim se tornando um problema, ai para resolver esse problema se analisa quantas caracterias pela quantidade de dados seria o suficiente para a classificacao.
+
+## Exercício 03
+```{r echo=FALSE}
+library(tibble)
+library(dplyr)
+
+D <- tibble(x_1 = rnorm(100,1,1),
+            x_2 = rnorm(100,-1,2),
+            y = factor(sample(c("one","two","three"),100,replace = T)))
+
+custom_knn <- function(k,x,D) {
+  D2 <- D %>% mutate( dist = sqrt((x[1] - x_1)^2 + (x[2] - x_2)^2)) %>% arrange(dist) %>% head(k) %>% count(y) %>% arrange(desc(n))
+    return(toString(D2$y[1]));
+}
+print(custom_knn(10, c(1,2), D))
+
+```
+
+## Exercício 04
+```{r echo=FALSE}
+library(tidyverse)
+data("iris") 
+iris <- as_tibble(iris) %>% select(Petal.Length,Sepal.Length,Species) %>% 
+  rename( x_1 = Petal.Length, x_2 = Sepal.Length, y = Species)
+l_iris <- as.list(iris)
+v_bool <- pmap_lgl(l_iris, function(x_1,x_2,y){
+  return( y == custom_knn(10, c(x_1,x_2), iris))
+}) 
+cat('with k = 10 my function is working for ', sum(v_bool),"/", nrow(iris[1]))
+
+v_bool2 <- pmap_lgl(l_iris, function(x_1,x_2,y){
+  return( y == custom_knn(1, c(x_1,x_2), iris))
+})
+
+cat('with k = 1 my function is working for ', sum(v_bool2),"/", nrow(iris[1]))
+
+```
